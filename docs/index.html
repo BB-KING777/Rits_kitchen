@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>立命館大学OICキッチンカー情報まとめ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #9C0000; /* 立命館カラー（濃い赤） */
+            --secondary-color: #FF8C00; /* オレンジ（フードイメージ） */
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #ddd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/api/placeholder/1200/400') center/cover;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 0 1rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #e67e00;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--secondary-color);
+        }
+
+        .info-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .info-list li:before {
+            content: '\f054';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+        }
+
+        .today-section {
+            margin-bottom: 3rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .shop-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .shop-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .shop-image {
+            height: 180px;
+            background-color: #eee;
+            position: relative;
+        }
+
+        .shop-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .shop-details {
+            padding: 1rem;
+        }
+
+        .shop-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .shop-location {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .shop-location i {
+            margin-right: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        .menu-price {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .area-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .area-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: #eee;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .area-tab:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+
+        .area-tab:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+
+        .area-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .schedule-section {
+            margin-bottom: 3rem;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .schedule-day {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .schedule-date {
+            font-weight: bold;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .schedule-area {
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .schedule-shops {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .schedule-shops li {
+            padding: 0.3rem 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .social-icons {
+            margin-bottom: 1rem;
+        }
+
+        .social-icons a {
+            color: white;
+            margin: 0 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.75rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">OIC<span>キッチンカー</span>INFO</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="shops.html">店舗一覧</a></li>
+                    <li><a href="schedule.html">出店スケジュール</a></li>
+                    <li><a href="map.html">マップ</a></li>
+                    <li><a href="review.html">レビュー</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>立命館大学OICキッチンカー情報まとめ</h1>
+            <p>OICキャンパスで楽しめる多彩なキッチンカーの情報を集約！</p>
+            <a href="#today" class="btn">今日のキッチンカーを見る</a>
+        </div>
+    </section>
+
+    <main>
+        <section id="overview">
+            <h2 class="section-title">営業概要</h2>
+            <div class="info-card">
+                <div class="info-content">
+                    <ul class="info-list">
+                        <li><strong>営業時間</strong>: 10:30〜15:30 (設営時間含む)</li>
+                        <li><strong>販売時間</strong>: 11:30〜13:30（売り切れ次第終了）</li>
+                        <li><strong>営業場所</strong>: TERRACE GATE前、空のプラザ</li>
+                        <li><strong>営業日</strong>: 月〜金の授業日・定期試験日（キッチンカーは週2回・火・木）</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="today" class="today-section">
+            <h2 class="section-title">本日のキッチンカー</h2>
+
+            <div class="area-tabs">
+                <button class="area-tab active" onclick="showArea('terrace')">TERRACE GATE前</button>
+                <button class="area-tab" onclick="showArea('plaza')">空のプラザ</button>
+            </div>
+
+            <div id="terrace-area" class="area-content">
+                <div class="grid-container">
+                    <!-- キッチンカー情報 -->
+                    <div class="shop-card">
+                        <div class="shop-image">
+                            <img src="/api/placeholder/300/180" alt="kyoto ケバブ屋 MOTO-3">
+                        </div>
+                        <div class="shop-details">
+                            <div class="shop-name">kyoto ケバブ屋 MOTO-3</div>
+                            <div class="shop-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                TERRACE GATE前
+                            </div>
+                            <div class="menu-item">
+                                <span>ケバブサンド</span>
+                                <span class="menu-price">500円〜</span>
+                            </div>
+                            <div class="menu-item">
+                                <span>アジアライス（小）</span>
+                                <span class="menu-price">700円〜</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <div class="shop-image">
+                            <img src="/api/placeholder/300/180" alt="はるきキッチン">
+                        </div>
+                        <div class="shop-details">
+                            <div class="shop-name">はるきキッチン</div>
+                            <div class="shop-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                TERRACE GATE前
+                            </div>
+                            <div class="menu-item">
+                                <span>ホルモンうどん</span>
+                                <span class="menu-price">700円</span>
+                            </div>
+                            <div class="menu-item">
+                                <span>おにぎり</span>
+                                <span class="menu-price">300円</span>
+                            </div>
+                            <div class="menu-item">
+                                <span>たません</span>
+                                <span class="menu-price">300円</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <div class="shop-image">
+                            <img src="/api/placeholder/300/180" alt="ROUTE24KITCHEN">
+                        </div>
+                        <div class="shop-details">
+                            <div class="shop-name">ROUTE24KITCHEN</div>
+                            <div class="shop-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                TERRACE GATE前
+                            </div>
+                            <div class="menu-item">
+                                <span>プレーンホットドッグ</span>
+                                <span class="menu-price">500円</span>
+                            </div>
+                            <div class="menu-item">
+                                <span>ベーシックホットドッグ</span>
+                                <span class="menu-price">600円</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="plaza-area" class="area-content" style="display: none;">
+                <div class="grid-container">
+                    <!-- キッチンカー情報 -->
+                    <div class="shop-card">
+                        <div class="shop-image">
+                            <img src="/api/placeholder/300/180" alt="RUI 食堂">
+                        </div>
+                        <div class="shop-details">
+                            <div class="shop-name">RUI 食堂</div>
+                            <div class="shop-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                空のプラザ
+                            </div>
+                            <div class="menu-item">
+                                <span>中華そば</span>
+                                <span class="menu-price">500円</span>
+                            </div>
+                            <div class="menu-item">
+                                <span>マディスピーチキン</span>
+                                <span class="menu-price">600円</span>
+                            </div>
+                            <div class="menu-item">
+                                <span>チリマヨ</span>
+                                <span class="menu-price">550円</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <div class="shop-image">
+                            <img src="/api/placeholder/300/180" alt="TencYo 食堂">
+                        </div>
+                        <div class="shop-details">
+                            <div class="shop-name">TencYo 食堂</div>
+                            <div class="shop-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                空のプラザ
+                            </div>
+                            <div class="menu-item">
+                                <span>こってり豚骨ラーメン</span>
+                                <span class="menu-price">600円〜</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <div class="shop-image">
+                            <img src="/api/placeholder/300/180" alt="キッチン花子">
+                        </div>
+                        <div class="shop-details">
+                            <div class="shop-name">キッチン花子</div>
+                            <div class="shop-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                空のプラザ
+                            </div>
+                            <div class="menu-item">
+                                <span>各種弁当</span>
+                                <span class="menu-price">600円〜</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="schedule-section">
+            <h2 class="section-title">今週の出店スケジュール</h2>
+            <div class="schedule-grid">
+                <div class="schedule-day">
+                    <div class="schedule-date">3月29日(金)</div>
+                    <div class="schedule-area">TERRACE GATE前</div>
+                    <ul class="schedule-shops">
+                        <li>CHARLES</li>
+                        <li>カステラ物語</li>
+                        <li>kyoto ケバブ屋 MOTO-3</li>
+                    </ul>
+                    <div class="schedule-area">空のプラザ</div>
+                    <ul class="schedule-shops">
+                        <li>RUI 食堂</li>
+                        <li>TencYo 食堂</li>
+                        <li>キッチン花子</li>
+                    </ul>
+                </div>
+
+                <div class="schedule-day">
+                    <div class="schedule-date">4月1日(月)</div>
+                    <div class="schedule-area">TERRACE GATE前</div>
+                    <ul class="schedule-shops">
+                        <li>とっとのレシピ</li>
+                        <li>ARAPSUN</li>
+                        <li>Well Cafe</li>
+                    </ul>
+                    <div class="schedule-area">空のプラザ</div>
+                    <ul class="schedule-shops">
+                        <li>ANGELKITCHEN</li>
+                        <li>Kitchencar Big Face</li>
+                        <li>デリカショップ モリタキ</li>
+                    </ul>
+                </div>
+
+                <div class="schedule-day">
+                    <div class="schedule-date">4月2日(火)</div>
+                    <div class="schedule-area">TERRACE GATE前</div>
+                    <ul class="schedule-shops">
+                        <li>CHARLES</li>
+                        <li>カステラ物語</li>
+                        <li>とっとのレシピ</li>
+                    </ul>
+                    <div class="schedule-area">空のプラザ</div>
+                    <ul class="schedule-shops">
+                        <li>フルーツキャンディー</li>
+                        <li>空のカメレオン</li>
+                        <li>キッチン花子</li>
+                    </ul>
+                </div>
+
+                <div class="schedule-day">
+                    <div class="schedule-date">4月3日(水)</div>
+                    <div class="schedule-area">TERRACE GATE前</div>
+                    <ul class="schedule-shops">
+                        <li>博多八町</li>
+                        <li>猫の花歌</li>
+                        <li>京一番</li>
+                    </ul>
+                    <div class="schedule-area">空のプラザ</div>
+                    <ul class="schedule-shops">
+                        <li>空のカメレオン</li>
+                        <li>ヤドカリKitchen</li>
+                        <li>洋食 Dining KIYO</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <a href="schedule.html" class="btn">全スケジュールを見る</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">ホーム</a>
+                <a href="shops.html">店舗一覧</a>
+                <a href="schedule.html">出店スケジュール</a>
+                <a href="map.html">マップ</a>
+                <a href="review.html">レビュー</a>
+                <a href="about.html">サイトについて</a>
+            </div>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-line"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 OICキッチンカーINFO - 非公式情報サイト<br>
+                立命館大学の公式サイトではありません
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showArea(area) {
+            // すべてのエリアコンテンツを非表示に
+            document.querySelectorAll('.area-content').forEach(content => {
+                content.style.display = 'none';
+            });
+
+            // すべてのタブからアクティブクラスを削除
+            document.querySelectorAll('.area-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 選択されたエリアを表示
+            document.getElementById(area + '-area').style.display = 'block';
+
+            // 選択されたタブをアクティブに
+            event.target.classList.add('active');
+        }
+
+        // 現在の日付を自動で設定
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const days = ['日', '月', '火', '水', '木', '金', '土'];
+            const dateStr = `${now.getMonth() + 1}月${now.getDate()}日(${days[now.getDay()]})`;
+
+            document.querySelectorAll('.schedule-date').forEach((dateElement, index) => {
+                if (index === 0) {
+                    dateElement.textContent = '本日: ' + dateStr;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

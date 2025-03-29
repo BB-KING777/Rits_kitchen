@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店舗一覧 - 立命館大学OICキッチンカー情報まとめ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #9C0000; /* 立命館カラー（濃い赤） */
+            --secondary-color: #FF8C00; /* オレンジ（フードイメージ） */
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #ddd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .page-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--secondary-color);
+        }
+
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .area-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .area-tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background-color: #eee;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .area-tab:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+
+        .area-tab:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+
+        .area-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .shop-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .shop-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .shop-image {
+            height: 180px;
+            background-color: #eee;
+            position: relative;
+        }
+
+        .shop-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .shop-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .shop-details {
+            padding: 1rem;
+        }
+
+        .shop-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .shop-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .shop-location {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .shop-location i {
+            margin-right: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .shop-rating {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .shop-rating i {
+            color: #FFD700;
+            margin-right: 0.25rem;
+        }
+
+        .menu-list {
+            margin-top: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        .menu-price {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination button:hover:not(.active) {
+            background-color: #f1f1f1;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .social-icons {
+            margin-bottom: 1rem;
+        }
+
+        .social-icons a {
+            color: white;
+            margin: 0 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.75rem;
+            }
+
+            .search-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-options {
+                justify-content: center;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">OIC<span>キッチンカー</span>INFO</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="shops.html">店舗一覧</a></li>
+                    <li><a href="schedule.html">出店スケジュール</a></li>
+                    <li><a href="map.html">マップ</a></li>
+                    <li><a href="review.html">レビュー</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1 class="page-title">キッチンカー店舗一覧</h1>
+
+        <div class="search-filter">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="店舗名、メニュー名で検索..." id="search-input">
+            </div>
+            <div class="filter-options">
+                <button class="filter-btn active" data-filter="all">すべて</button>
+                <button class="filter-btn" data-filter="popular">人気店</button>
+                <button class="filter-btn" data-filter="cheap">500円以下</button>
+                <button class="filter-btn" data-filter="healthy">ヘルシー</button>
+            </div>
+        </div>
+
+        <div class="area-tabs">
+            <button class="area-tab active" onclick="showArea('all')">すべて</button>
+            <button class="area-tab" onclick="showArea('terrace')">TERRACE GATE前</button>
+            <button class="area-tab" onclick="showArea('plaza')">空のプラザ</button>
+        </div>
+
+        <div class="shop-grid">
+            <!-- TERRACE GATE前店舗 -->
+            <div class="shop-card" data-area="terrace" data-tags="popular">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="kyoto ケバブ屋 MOTO-3">
+                    <div class="shop-tag">人気店</div>
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">kyoto ケバブ屋 MOTO-3</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            TERRACE GATE前
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.5
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>ケバブサンド</span>
+                            <span class="menu-price">500円〜</span>
+                        </div>
+                        <div class="menu-item">
+                            <span>アジアライス（小）</span>
+                            <span class="menu-price">700円〜</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-card" data-area="terrace" data-tags="cheap">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="はるきキッチン">
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">はるきキッチン</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            TERRACE GATE前
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.2
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>ホルモンうどん</span>
+                            <span class="menu-price">700円</span>
+                        </div>
+                        <div class="menu-item">
+                            <span>おにぎり</span>
+                            <span class="menu-price">300円</span>
+                        </div>
+                        <div class="menu-item">
+                            <span>たません</span>
+                            <span class="menu-price">300円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-card" data-area="terrace" data-tags="">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="ROUTE24KITCHEN">
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">ROUTE24KITCHEN</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            TERRACE GATE前
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.0
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>プレーンホットドッグ</span>
+                            <span class="menu-price">500円</span>
+                        </div>
+                        <div class="menu-item">
+                            <span>ベーシックホットドッグ</span>
+                            <span class="menu-price">600円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-card" data-area="terrace" data-tags="popular">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="CHARLES">
+                    <div class="shop-tag">人気店</div>
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">CHARLES</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            TERRACE GATE前
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.7
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>生アサイーボウル</span>
+                            <span class="menu-price">500円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-card" data-area="terrace" data-tags="cheap">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="カステラ物語">
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">カステラ物語</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            TERRACE GATE前
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.3
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>ベビーカステラ</span>
+                            <span class="menu-price">500円〜</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 空のプラザ店舗 -->
+            <div class="shop-card" data-area="plaza" data-tags="popular">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="RUI 食堂">
+                    <div class="shop-tag">人気店</div>
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">RUI 食堂</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            空のプラザ
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.6
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>中華そば</span>
+                            <span class="menu-price">500円</span>
+                        </div>
+                        <div class="menu-item">
+                            <span>マディスピーチキン</span>
+                            <span class="menu-price">600円</span>
+                        </div>
+                        <div class="menu-item">
+                            <span>チリマヨ</span>
+                            <span class="menu-price">550円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-card" data-area="plaza" data-tags="">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="TencYo 食堂">
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">TencYo 食堂</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            空のプラザ
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.1
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>こってり豚骨ラーメン</span>
+                            <span class="menu-price">600円〜</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-card" data-area="plaza" data-tags="healthy">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="ANGELKITCHEN">
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">ANGELKITCHEN</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            空のプラザ
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.4
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>クレープ</span>
+                            <span class="menu-price">450円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-card" data-area="plaza" data-tags="cheap healthy">
+                <div class="shop-image">
+                    <img src="/api/placeholder/300/180" alt="晴レルヤKitchen">
+                </div>
+                <div class="shop-details">
+                    <div class="shop-name">晴レルヤKitchen</div>
+                    <div class="shop-meta">
+                        <div class="shop-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            空のプラザ
+                        </div>
+                        <div class="shop-rating">
+                            <i class="fas fa-star"></i>
+                            4.2
+                        </div>
+                    </div>
+                    <div class="menu-list">
+                        <div class="menu-item">
+                            <span>おむすび</span>
+                            <span class="menu-price">300円〜</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>次へ</button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">ホーム</a>
+                <a href="shops.html">店舗一覧</a>
+                <a href="schedule.html">出店スケジュール</a>
+                <a href="map.html">マップ</a>
+                <a href="review.html">レビュー</a>
+                <a href="about.html">サイトについて</a>
+            </div>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-line"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 OICキッチンカーINFO - 非公式情報サイト<br>
+                立命館大学の公式サイトではありません
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 検索機能
+        document.getElementById('search-input').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const shopCards = document.querySelectorAll('.shop-card');
+
+            shopCards.forEach(card => {
+                const shopName = card.querySelector('.shop-name').textContent.toLowerCase();
+                const menuItems = card.querySelectorAll('.menu-item');
+                let menuMatches = false;
+
+                menuItems.forEach(item => {
+                    if (item.textContent.toLowerCase().includes(searchValue)) {
+                        menuMatches = true;
+                    }
+                });
+
+                if (shopName.includes(searchValue) || menuMatches) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // フィルター機能
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // アクティブクラスの切り替え
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.getAttribute('data-filter');
+                const shopCards = document.querySelectorAll('.shop-card');
+
+                shopCards.forEach(card => {
+                    if (filter === 'all') {
+                        card.style.display = '';
+                    } else {
+                        const tags = card.getAttribute('data-tags');
+                        if (tags.includes(filter)) {
+                            card.style.display = '';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+
+        // エリア切り替え
+        function showArea(area) {
+            // タブのアクティブ状態を更新
+            document.querySelectorAll('.area-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 店舗表示を更新
+            const shopCards = document.querySelectorAll('.shop-card');
+
+            shopCards.forEach(card => {
+                const cardArea = card.getAttribute('data-area');
+                if (area === 'all' || cardArea === area) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

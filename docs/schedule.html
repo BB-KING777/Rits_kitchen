@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出店スケジュール - 立命館大学OICキッチンカー情報まとめ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #9C0000; /* 立命館カラー（濃い赤） */
+            --secondary-color: #FF8C00; /* オレンジ（フードイメージ） */
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #ddd;
+            --highlight-color: #f0f0f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .page-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--secondary-color);
+        }
+
+        .schedule-info {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .schedule-info p {
+            margin-bottom: 0.5rem;
+        }
+
+        .schedule-info strong {
+            color: var(--primary-color);
+        }
+
+        .month-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .month-btn {
+            padding: 0.5rem 1.5rem;
+            margin: 0 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .month-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .month-btn:hover:not(.active) {
+            background-color: #f1f1f1;
+        }
+
+        .calendar {
+            margin-bottom: 3rem;
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border-left: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .calendar-day {
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            min-height: 120px;
+            padding: 0.5rem;
+            position: relative;
+        }
+
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .today .day-number {
+            background-color: var(--primary-color);
+            color: white;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .day-content {
+            font-size: 0.9rem;
+        }
+
+        .shop-tag {
+            display: inline-block;
+            margin: 0.1rem 0;
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            background-color: #e0e0e0;
+        }
+
+        .shop-tag.terrace {
+            background-color: #FFEED0;
+        }
+
+        .shop-tag.plaza {
+            background-color: #D0EFFF;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 1rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 10px;
+            margin-right: 0.5rem;
+        }
+
+        .legend-color.terrace {
+            background-color: #FFEED0;
+        }
+
+        .legend-color.plaza {
+            background-color: #D0EFFF;
+        }
+
+        .weekly-schedule {
+            margin-top: 3rem;
+        }
+
+        .week-container {
+            margin-bottom: 2rem;
+        }
+
+        .week-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .daily-schedule {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .schedule-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .schedule-date {
+            font-weight: bold;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .schedule-card.today .schedule-date {
+            background-color: var(--secondary-color);
+        }
+
+        .schedule-content {
+            padding: 1rem;
+        }
+
+        .location-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px dashed var(--border-color);
+            color: var(--primary-color);
+        }
+
+        .location-title.terrace {
+            color: #D86000;
+        }
+
+        .location-title.plaza {
+            color: #0070BB;
+        }
+
+        .shop-list {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .shop-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            font-size: 0.95rem;
+        }
+
+        .shop-list li:not(:last-child) {
+            border-bottom: 1px dotted var(--border-color);
+        }
+
+        .shop-specialty {
+            font-size: 0.8rem;
+            color: #666;
+            max-width: 60%;
+        }
+
+        .download-section {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .download-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background-color: #800000;
+        }
+
+        .download-btn i {
+            margin-right: 0.5rem;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .social-icons {
+            margin-bottom: 1rem;
+        }
+
+        .social-icons a {
+            color: white;
+            margin: 0 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+            }
+
+            nav ul li {
+                margin: 0 0.75rem;
+            }
+
+            .calendar-header, .calendar-grid {
+                font-size: 0.9rem;
+            }
+
+            .calendar-day {
+                min-height: 100px;
+                padding: 0.3rem;
+            }
+
+            .shop-tag {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">OIC<span>キッチンカー</span>INFO</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="shops.html">店舗一覧</a></li>
+                    <li><a href="schedule.html">出店スケジュール</a></li>
+                    <li><a href="map.html">マップ</a></li>
+                    <li><a href="review.html">レビュー</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1 class="page-title">出店スケジュール</h1>
+
+        <div class="schedule-info">
+            <p><strong>営業時間</strong>: 10:30〜15:30 (設営時間含む)</p>
+            <p><strong>販売時間</strong>: 11:30〜13:30（売り切れ次第終了）</p>
+            <p><strong>営業日</strong>: 月〜金の授業日・定期試験日（キッチンカーは週2回・火・木）</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color terrace"></div>
+                <span>TERRACE GATE前</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color plaza"></div>
+                <span>空のプラザ</span>
+            </div>
+        </div>
+
+        <div class="month-selector">
+            <button class="month-btn">3月</button>
+            <button class="month-btn active">4月</button>
+            <button class="month-btn">5月</button>
+        </div>
+
+        <div class="calendar">
+            <div class="calendar-header">
+                <div>日</div>
+                <div>月</div>
+                <div>火</div>
+                <div>水</div>
+                <div>木</div>
+                <div>金</div>
+                <div>土</div>
+            </div>
+            <div class="calendar-grid">
+                <!-- 前月の日付 -->
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">31</div>
+                </div>
+
+                <!-- 4月の日付 -->
+                <div class="calendar-day">
+                    <div class="day-number">1</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">とっとのレシピ</div>
+                        <div class="shop-tag plaza">ANGELKITCHEN</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">2</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">CHARLES</div>
+                        <div class="shop-tag plaza">フルーツキャンディー</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">3</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">博多八町</div>
+                        <div class="shop-tag plaza">空のカメレオン</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">4</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">kyoto ケバブ屋 MOTO-3</div>
+                        <div class="shop-tag plaza">RUI 食堂</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">5</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">ROUTE24KITCHEN</div>
+                        <div class="shop-tag plaza">キッチン花子</div>
+                    </div>
+                </div>
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">6</div>
+                </div>
+
+                <!-- 2行目 -->
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">7</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">8</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">CHARLES</div>
+                        <div class="shop-tag plaza">ANGELKITCHEN</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">9</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">カステラ物語</div>
+                        <div class="shop-tag plaza">フルーツキャンディー</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">10</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">kyoto ケバブ屋 MOTO-3</div>
+                        <div class="shop-tag plaza">RUI 食堂</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">11</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">はるきキッチン</div>
+                        <div class="shop-tag plaza">TencYo 食堂</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">12</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">猫の花歌</div>
+                        <div class="shop-tag plaza">ICE KITCHEN MIKAN</div>
+                    </div>
+                </div>
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">13</div>
+                </div>
+
+                <!-- 3行目 -->
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">14</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">15</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">CHARLES</div>
+                        <div class="shop-tag plaza">フルーツキャンディー</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">16</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">京一番</div>
+                        <div class="shop-tag plaza">Rabbit's Crepe</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">17</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">博多八町</div>
+                        <div class="shop-tag plaza">キッチンカー F</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">18</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">kyoto ケバブ屋 MOTO-3</div>
+                        <div class="shop-tag plaza">RUI 食堂</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">19</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">ネイチャーキッチン 悠久風</div>
+                        <div class="shop-tag plaza">キッチン花子</div>
+                    </div>
+                </div>
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">20</div>
+                </div>
+
+                <!-- 4行目 -->
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">21</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">22</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">CHARLES</div>
+                        <div class="shop-tag plaza">キッチン花子</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">23</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">カステラ物語</div>
+                        <div class="shop-tag plaza">デリカショップ モリタキ</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">24</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">ROUTE24KITCHEN</div>
+                        <div class="shop-tag plaza">洋食 Dining KIYO</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">25</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">cheR good time</div>
+                        <div class="shop-tag plaza">ヤドカリKitchen</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">26</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">からあげ屋大</div>
+                        <div class="shop-tag plaza">リトルフィート カフェ</div>
+                    </div>
+                </div>
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">27</div>
+                </div>
+
+                <!-- 5行目 -->
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">28</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">29</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">CHARLES</div>
+                        <div class="shop-tag plaza">キッチン花子</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="day-number">30</div>
+                    <div class="day-content">
+                        <div class="shop-tag terrace">カステラ物語</div>
+                        <div class="shop-tag plaza">デリカショップ モリタキ</div>
+                    </div>
+                </div>
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">1</div>
+                </div>
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">2</div>
+                </div>
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">3</div>
+                </div>
+                <div class="calendar-day" style="background-color: var(--highlight-color);">
+                    <div class="day-number">4</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="weekly-schedule">
+            <h2 class="section-title">今週の詳細スケジュール</h2>
+
+            <div class="week-container">
+                <div class="daily-schedule">
+                    <div class="schedule-card today">
+                        <div class="schedule-date">4月1日(月)</div>
+                        <div class="schedule-content">
+                            <div class="location-title terrace">TERRACE GATE前</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>とっとのレシピ</span>
+                                    <span class="shop-specialty">チュロス / カレー</span>
+                                </li>
+                                <li>
+                                    <span>ARAPSUN</span>
+                                    <span class="shop-specialty">アジア料理</span>
+                                </li>
+                                <li>
+                                    <span>Well Cafe</span>
+                                    <span class="shop-specialty">ザンギゴムチキン</span>
+                                </li>
+                            </ul>
+                            <div class="location-title plaza">空のプラザ</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>ANGELKITCHEN</span>
+                                    <span class="shop-specialty">クレープ</span>
+                                </li>
+                                <li>
+                                    <span>Kitchencar Big Face</span>
+                                    <span class="shop-specialty">ロコモコ丼</span>
+                                </li>
+                                <li>
+                                    <span>デリカショップ モリタキ</span>
+                                    <span class="shop-specialty">各種弁当</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="schedule-card">
+                        <div class="schedule-date">4月2日(火)</div>
+                        <div class="schedule-content">
+                            <div class="location-title terrace">TERRACE GATE前</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>CHARLES</span>
+                                    <span class="shop-specialty">生アサイーボウル</span>
+                                </li>
+                                <li>
+                                    <span>カステラ物語</span>
+                                    <span class="shop-specialty">ベビーカステラ</span>
+                                </li>
+                                <li>
+                                    <span>とっとのレシピ</span>
+                                    <span class="shop-specialty">チュロス / カレー</span>
+                                </li>
+                            </ul>
+                            <div class="location-title plaza">空のプラザ</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>フルーツキャンディー</span>
+                                    <span class="shop-specialty">塩たまご / おしるこ</span>
+                                </li>
+                                <li>
+                                    <span>空のカメレオン</span>
+                                    <span class="shop-specialty">ローストビーフ丼</span>
+                                </li>
+                                <li>
+                                    <span>キッチン花子</span>
+                                    <span class="shop-specialty">各種弁当</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="schedule-card">
+                        <div class="schedule-date">4月3日(水)</div>
+                        <div class="schedule-content">
+                            <div class="location-title terrace">TERRACE GATE前</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>博多八町</span>
+                                    <span class="shop-specialty">博多ひとくち餃子</span>
+                                </li>
+                                <li>
+                                    <span>猫の花歌</span>
+                                    <span class="shop-specialty">クレープ</span>
+                                </li>
+                                <li>
+                                    <span>京一番</span>
+                                    <span class="shop-specialty">肉巻き棒 / 小籠包</span>
+                                </li>
+                            </ul>
+                            <div class="location-title plaza">空のプラザ</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>空のカメレオン</span>
+                                    <span class="shop-specialty">ローストビーフ丼</span>
+                                </li>
+                                <li>
+                                    <span>ヤドカリKitchen</span>
+                                    <span class="shop-specialty">ホットドッグ</span>
+                                </li>
+                                <li>
+                                    <span>洋食 Dining KIYO</span>
+                                    <span class="shop-specialty">各種弁当</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="schedule-card">
+                        <div class="schedule-date">4月4日(木)</div>
+                        <div class="schedule-content">
+                            <div class="location-title terrace">TERRACE GATE前</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>kyoto ケバブ屋 MOTO-3</span>
+                                    <span class="shop-specialty">ケバブサンド</span>
+                                </li>
+                                <li>
+                                    <span>はるきキッチン</span>
+                                    <span class="shop-specialty">ホルモンうどん</span>
+                                </li>
+                                <li>
+                                    <span>京タコス</span>
+                                    <span class="shop-specialty">タコス / タコライス</span>
+                                </li>
+                            </ul>
+                            <div class="location-title plaza">空のプラザ</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>RUI 食堂</span>
+                                    <span class="shop-specialty">中華そば</span>
+                                </li>
+                                <li>
+                                    <span>TencYo 食堂</span>
+                                    <span class="shop-specialty">豚骨ラーメン</span>
+                                </li>
+                                <li>
+                                    <span>キッチンカー F</span>
+                                    <span class="shop-specialty">チュロスカップ</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="schedule-card">
+                        <div class="schedule-date">4月5日(金)</div>
+                        <div class="schedule-content">
+                            <div class="location-title terrace">TERRACE GATE前</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>ROUTE24KITCHEN</span>
+                                    <span class="shop-specialty">ホットドッグ</span>
+                                </li>
+                                <li>
+                                    <span>TAKUMI</span>
+                                    <span class="shop-specialty">クレープ</span>
+                                </li>
+                                <li>
+                                    <span>ARAPSUN 2号車</span>
+                                    <span class="shop-specialty">チュロス / アイス</span>
+                                </li>
+                            </ul>
+                            <div class="location-title plaza">空のプラザ</div>
+                            <ul class="shop-list">
+                                <li>
+                                    <span>キッチン花子</span>
+                                    <span class="shop-specialty">各種弁当</span>
+                                </li>
+                                <li>
+                                    <span>ICE KITCHEN MIKAN</span>
+                                    <span class="shop-specialty">テキライス / アイス</span>
+                                </li>
+                                <li>
+                                    <span>Avvolgere&fritto</span>
+                                    <span class="shop-specialty">ご飯巻き和ピザり</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <h3 class="download-title">月間スケジュール表をダウンロード</h3>
+            <a href="#" class="download-btn">
+                <i class="fas fa-download"></i>
+                4月スケジュール表（PDF）
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">ホーム</a>
+                <a href="shops.html">店舗一覧</a>
+                <a href="schedule.html">出店スケジュール</a>
+                <a href="map.html">マップ</a>
+                <a href="review.html">レビュー</a>
+                <a href="about.html">サイトについて</a>
+            </div>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-line"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 OICキッチンカーINFO - 非公式情報サイト<br>
+                立命館大学の公式サイトではありません
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 現在の日付でカレンダーの今日をハイライトする
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const currentDay = today.getDate();
+
+            // カレンダー内の日付要素を取得
+            const calendarDays = document.querySelectorAll('.calendar-day');
+
+            calendarDays.forEach(day => {
+                const dayNumber = parseInt(day.querySelector('.day-number').textContent);
+
+                // 現在の月の場合のみ適用
+                if (dayNumber === currentDay && !day.style.backgroundColor) {
+                    day.classList.add('today');
+                }
+            });
+        });
+
+        // 月の切り替え（デモ表示用）
+        document.querySelectorAll('.month-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.month-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                // 実際のアプリケーションでは、選択した月のカレンダーデータを読み込む処理を実装する
+            });
+        });
+    </script>
+</body>
+</html>
